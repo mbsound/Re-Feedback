@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Resources/icon.png" alt="Re-Feedback" width="220" />
+  <img src="Resources/re_feedback_logo.png" alt="Re-Feedback" width="220" />
 </p>
 
 # Re-Feedback
@@ -145,8 +145,3 @@ In your DAW plugin browser:
 
 This project is licensed under the GNU General Public License v3.0 (GPLv3) - see the [LICENSE](LICENSE) file for details.
 
----
-
-<p align="center">
-  <i>Created by Omega Dumpster (<a href="https://github.com/mbsound">mbsound</a>)</i>
-</p>
