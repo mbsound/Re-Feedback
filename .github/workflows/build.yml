@@ -1,0 +1,128 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    name: Build macOS (Universal AU / VST3 / App)
+    runs-on: macos-14
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Ninja & CMake
+        run: |
+          brew install ninja cmake
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="10.15"
+
+      - name: Build Plugins & Tests
+        run: |
+          cmake --build build --config Release
+
+      - name: Run DSP Unit Tests
+        run: |
+          ./build/DSPTests
+
+      - name: Package macOS DMG & Zip
+        run: |
+          ./scripts/build_mac.sh
+          mkdir -p release_package
+          cp -R "build_mac/ReFeedback_artefacts/Release/AU/Re-Feedback.component" release_package/
+          cp -R "build_mac/ReFeedback_artefacts/Release/VST3/Re-Feedback.vst3" release_package/
+          cp -R "build_mac/ReFeedback_artefacts/Release/Standalone/Re-Feedback.app" release_package/
+          cp Mac/Install_To_Mac.command release_package/
+          cp Mac/Instructions_For_Friend.txt release_package/
+          
+          # Create DMG
+          DMG_STAGING="dmg_staging"
+          mkdir -p "$DMG_STAGING"
+          cp -R release_package/* "$DMG_STAGING/"
+          ln -s /Applications "$DMG_STAGING/Applications"
+          hdiutil create -volname "Oops All Feedback" -srcfolder "$DMG_STAGING" -ov -format UDZO "Re-Feedback-macOS.dmg"
+          
+          # Create Zip
+          cd release_package && zip -r -y -q ../Re-Feedback-macOS.zip . && cd ..
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Re-Feedback-macOS
+          path: |
+            Re-Feedback-macOS.dmg
+            Re-Feedback-macOS.zip
+
+  build-linux:
+    name: Build Linux (VST3 / Standalone)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libjack-jackd2-dev \
+            ladspa-sdk libfreetype6-dev libx11-dev libxcomposite-dev \
+            libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev \
+            libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev \
+            mesa-common-dev ninja-build
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -GNinja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build Plugins & Tests
+        run: |
+          cmake --build build --config Release
+
+      - name: Run DSP Unit Tests
+        run: |
+          ./build/DSPTests
+
+      - name: Package Linux
+        run: |
+          mkdir -p release_linux
+          cp -R build/ReFeedback_artefacts/Release/VST3/Re-Feedback.vst3 release_linux/ 2>/dev/null || true
+          cp -R build/ReFeedback_artefacts/Release/Standalone/Re-Feedback release_linux/ 2>/dev/null || true
+          cd release_linux && tar -czf ../Re-Feedback-Linux.tar.gz . && cd ..
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Re-Feedback-Linux
+          path: Re-Feedback-Linux.tar.gz
+
+  release:
+    name: Create GitHub Release
+    needs: [ build-macos, build-linux ]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            Re-Feedback-macOS/Re-Feedback-macOS.dmg
+            Re-Feedback-macOS/Re-Feedback-macOS.zip
+            Re-Feedback-Linux/Re-Feedback-Linux.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

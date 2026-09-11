@@ -1,0 +1,44 @@
+========================================================================
+  Re-Feedback by Omega Dumpster — macOS Installation Guide
+========================================================================
+
+Thank you for checking out Re-Feedback!
+
+Re-Feedback is a hyper-configurable physical & electronic feedback synthesizer
+and overtone resonator designed to model amplifier coupling, microphone Larsen
+howl, tuned resonant overtones, and runaway chaos squeals.
+
+------------------------------------------------------------------------
+HOW TO RUN / INSTALL:
+------------------------------------------------------------------------
+
+METHOD 1: Automatic 1-Click Install & Gatekeeper Fix (Recommended)
+1. Double-click "Install_To_Mac.command" in this folder.
+   (It will copy the plugins to your system folders and remove macOS quarantine flags).
+2. Double-click "Re-Feedback.app" to run Standalone, or restart your DAW.
+
+METHOD 2: Running the Standalone App Directly
+- If macOS says "This application cannot be opened" or "Unidentified Developer":
+  Option A: Right-click (or Control-click) "Re-Feedback.app" -> Select "Open" -> Click "Open" on the prompt.
+  Option B: Go to System Settings > Privacy & Security, scroll down to Security, and click "Open Anyway".
+  Option C: In Terminal, run:
+    xattr -cr "/path/to/Re-Feedback.app"
+
+METHOD 3: Manual Plugin Drag & Drop
+1. Audio Unit (AU): Copy "Re-Feedback.component" to:
+   ~/Library/Audio/Plug-Ins/Components/
+2. VST3: Copy "Re-Feedback.vst3" to:
+   ~/Library/Audio/Plug-Ins/VST3/
+
+(Tip: In Finder, press Shift + Command + G and paste the paths above to jump directly there.)
+
+------------------------------------------------------------------------
+DAW Compatibility:
+------------------------------------------------------------------------
+- Logic Pro, GarageBand -> Uses Audio Unit (.component)
+- Ableton Live, Reaper, FL Studio, Bitwig, Cubase, Studio One -> Uses VST3 or AU
+
+Under your DAW's plugin browser, look for:
+Manufacturer: "Omega Dumpster"
+Plugin Name:  "Re-Feedback"
+========================================================================

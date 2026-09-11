@@ -1,0 +1,62 @@
+# ==============================================================================
+# Git Ignore for Re-Feedback (JUCE / CMake / macOS / Linux / Windows)
+# ==============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Build directories & intermediate outputs
+build/
+build_mac/
+build_linux/
+build_windows/
+build_ninja/
+cmake-build-*/
+dmg_staging/
+icon.iconset/
+*.iconset/
+
+# Ninja & CMake cache
+.ninja_deps
+.ninja_log
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+_deps/
+*juceaide*
+*juce_vst3_helper*
+
+# JUCE build artefacts
+*_artefacts/
+JuceLibraryCode/
+
+# Binary Releases (deploy to GitHub Releases)
+*.dmg
+*.zip
+*.tar.gz
+Re-Feedback_Mac_Plugins/
+Mac/Re-Feedback.app
+Mac/Re-Feedback.component
+Mac/Re-Feedback.vst3
+
+# Standalone test binaries
+DSPTests
+DSPTests_asan
+
+# IDEs
+.idea/
+.vscode/
+*.xcodeproj/
+*.xcworkspace/
+*.user
+*.suo
+
+# System generated
+.system_generated/
+.gemini/
